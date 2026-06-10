@@ -4,6 +4,7 @@ export default function BottomNav({ page, setPage }) {
     { id: 'exercises', label: 'Exercises', icon: '🏋️' },
     { id: 'log', label: 'Log', icon: '✅' },
     { id: 'food', label: 'Food', icon: '🥗' },
+    { id: 'hub', label: 'Hub', icon: '💬' },
   ]
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex">
