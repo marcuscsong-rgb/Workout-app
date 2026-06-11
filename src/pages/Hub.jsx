@@ -12,7 +12,10 @@ export default function Hub({ user }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showWorkoutPicker, setShowWorkoutPicker] = useState(false)
- const [myWorkouts, setMyWorkouts] = useState([])
+const [myWorkouts, setMyWorkouts] = useState([])
+  const [editingHub, setEditingHub] = useState(null)
+  const [editName, setEditName] = useState('')
+  const [sort, setSort] = useState('az')
 const [showInvite, setShowInvite] = useState(false)
 const [inviteToHub, setInviteToHub] = useState('')
 const [inviteMsg, setInviteMsg] = useState(null)
@@ -61,6 +64,21 @@ const [inviteMsg, setInviteMsg] = useState(null)
     if (!newMessage.trim()) return
     await supabase.from('messages').insert({ hub_id: activeHub.id, user_id: user.id, type: 'text', content: newMessage.trim() })
     setNewMessage('')
+  }
+  async function deleteHub(hubId) {
+    if (!confirm('Delete this hub and all its messages?')) return
+    await supabase.from('messages').delete().eq('hub_id', hubId)
+    await supabase.from('hub_members').delete().eq('hub_id', hubId)
+    const { error } = await supabase.from('hubs').delete().eq('id', hubId)
+    if (error) alert('Failed to delete: ' + error.message)
+    else loadHubs()
+  }
+
+  async function saveHubName(hubId) {
+    if (!editName.trim()) return
+    const { error } = await supabase.from('hubs').update({ name: editName }).eq('id', hubId)
+    if (error) alert('Failed to update: ' + error.message)
+    else { setEditingHub(null); loadHubs() }
   }
 async function inviteMember() {
   if (!inviteToHub.trim()) return
@@ -122,7 +140,15 @@ async function inviteMember() {
           <p style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#A0845C', margin: '0 0 6px 0' }}>SHARE</p>
           <h1 style={{ fontSize: '36px', fontWeight: '900', textTransform: 'uppercase', color: '#3B2507', margin: 0, letterSpacing: '0.04em' }}>MY HUBS</h1>
         </div>
-        <button onClick={() => setShowNewHub(true)} style={btnPrimary}>+ NEW</button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setSort(sort === 'az' ? 'za' : 'az')}
+            style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: '2px solid #C4A97D', padding: '8px 10px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+          >
+            {sort === 'az' ? 'A→Z' : 'Z→A'}
+          </button>
+          <button onClick={() => setShowNewHub(true)} style={btnPrimary}>+ NEW</button>
+        </div>
       </div>
 
       {showNewHub && (
@@ -148,14 +174,42 @@ async function inviteMember() {
           <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C4A97D' }}>CREATE A HUB AND INVITE A FRIEND</div>
         </div>
       ) : (
-        hubs.map(hub => (
-          <button key={hub.id} onClick={() => setActiveHub(hub)} style={{ width: '100%', padding: '20px 24px', borderBottom: '2px solid #C4A97D', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', borderBottom: '2px solid #C4A97D', cursor: 'pointer', textAlign: 'left', backgroundColor: '#EDE8DC' }}>
-            <div>
-              <div style={{ fontSize: '16px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', fontFamily: 'Arial Black, Arial, sans-serif' }}>{hub.name}</div>
-              <div style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', marginTop: '3px' }}>TAP TO OPEN</div>
-            </div>
-            <span style={{ fontSize: '12px', color: '#C4A97D', fontWeight: '900' }}>→</span>
-          </button>
+      [...hubs].sort((a, b) => sort === 'az' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)).map(hub => (
+          <div key={hub.id} style={{ borderBottom: '2px solid #C4A97D', backgroundColor: '#EDE8DC' }}>
+            {editingHub?.id === hub.id ? (
+              <div style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  style={{ flex: 1, border: '2px solid #C4A97D', borderRadius: '4px', padding: '8px 12px', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', backgroundColor: '#EDE8DC', color: '#3B2507', fontFamily: 'Arial Black, Arial, sans-serif', outline: 'none' }}
+                />
+                <button onClick={() => saveHubName(hub.id)} style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#EDE8DC', backgroundColor: '#3B2507', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}>SAVE</button>
+                <button onClick={() => setEditingHub(null)} style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', color: '#A0845C', backgroundColor: 'none', border: '2px solid #C4A97D', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}>CANCEL</button>
+              </div>
+            ) : (
+              <div style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <button onClick={() => setActiveHub(hub)} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                  <div style={{ fontSize: '16px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', fontFamily: 'Arial Black, Arial, sans-serif' }}>{hub.name}</div>
+                  <div style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', marginTop: '3px' }}>TAP TO OPEN</div>
+                </button>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    onClick={() => { setEditingHub(hub); setEditName(hub.name) }}
+                    style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: '2px solid #C4A97D', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+                  >
+                    EDIT
+                  </button>
+                  <button
+                    onClick={() => deleteHub(hub.id)}
+                    style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9B2335', background: 'none', border: '2px solid #9B2335', padding: '5px 8px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+                  >
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         ))
       )}
     </div>
