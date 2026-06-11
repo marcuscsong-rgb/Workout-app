@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
 const exercises = [
-  // Chest
   { name: 'Bench Press', muscle: 'Chest', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Incline Bench Press', muscle: 'Chest', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Decline Bench Press', muscle: 'Chest', equipment: 'Barbell', difficulty: 'Intermediate' },
@@ -19,7 +18,6 @@ const exercises = [
   { name: 'Chest Dips', muscle: 'Chest', equipment: 'Bodyweight', difficulty: 'Intermediate' },
   { name: 'Pec Deck Machine', muscle: 'Chest', equipment: 'Machine', difficulty: 'Beginner' },
   { name: 'Landmine Press', muscle: 'Chest', equipment: 'Barbell', difficulty: 'Intermediate' },
-  // Back
   { name: 'Pull Up', muscle: 'Back', equipment: 'Bodyweight', difficulty: 'Intermediate' },
   { name: 'Chin Up', muscle: 'Back', equipment: 'Bodyweight', difficulty: 'Intermediate' },
   { name: 'Wide Grip Pull Up', muscle: 'Back', equipment: 'Bodyweight', difficulty: 'Advanced' },
@@ -38,7 +36,6 @@ const exercises = [
   { name: 'Face Pull', muscle: 'Back', equipment: 'Cable', difficulty: 'Beginner' },
   { name: 'Straight Arm Pulldown', muscle: 'Back', equipment: 'Cable', difficulty: 'Beginner' },
   { name: 'Hyperextension', muscle: 'Back', equipment: 'Machine', difficulty: 'Beginner' },
-  // Legs
   { name: 'Back Squat', muscle: 'Legs', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Front Squat', muscle: 'Legs', equipment: 'Barbell', difficulty: 'Advanced' },
   { name: 'Goblet Squat', muscle: 'Legs', equipment: 'Dumbbell', difficulty: 'Beginner' },
@@ -60,7 +57,6 @@ const exercises = [
   { name: 'Step Up', muscle: 'Legs', equipment: 'Dumbbell', difficulty: 'Beginner' },
   { name: 'Sissy Squat', muscle: 'Legs', equipment: 'Bodyweight', difficulty: 'Advanced' },
   { name: 'Sumo Squat', muscle: 'Legs', equipment: 'Dumbbell', difficulty: 'Beginner' },
-  // Shoulders
   { name: 'Overhead Press', muscle: 'Shoulders', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Seated Dumbbell Press', muscle: 'Shoulders', equipment: 'Dumbbell', difficulty: 'Beginner' },
   { name: 'Arnold Press', muscle: 'Shoulders', equipment: 'Dumbbell', difficulty: 'Intermediate' },
@@ -73,7 +69,6 @@ const exercises = [
   { name: 'Machine Shoulder Press', muscle: 'Shoulders', equipment: 'Machine', difficulty: 'Beginner' },
   { name: 'Push Press', muscle: 'Shoulders', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Behind the Neck Press', muscle: 'Shoulders', equipment: 'Barbell', difficulty: 'Advanced' },
-  // Arms
   { name: 'Barbell Bicep Curl', muscle: 'Arms', equipment: 'Barbell', difficulty: 'Beginner' },
   { name: 'Dumbbell Bicep Curl', muscle: 'Arms', equipment: 'Dumbbell', difficulty: 'Beginner' },
   { name: 'Hammer Curl', muscle: 'Arms', equipment: 'Dumbbell', difficulty: 'Beginner' },
@@ -87,34 +82,24 @@ const exercises = [
   { name: 'Tricep Dips', muscle: 'Arms', equipment: 'Bodyweight', difficulty: 'Beginner' },
   { name: 'Close Grip Bench Press', muscle: 'Arms', equipment: 'Barbell', difficulty: 'Intermediate' },
   { name: 'Rope Pushdown', muscle: 'Arms', equipment: 'Cable', difficulty: 'Beginner' },
-  { name: 'Wrist Curl', muscle: 'Arms', equipment: 'Dumbbell', difficulty: 'Beginner' },
-  { name: 'Reverse Curl', muscle: 'Arms', equipment: 'Barbell', difficulty: 'Beginner' },
-  // Core - General
   { name: 'Crunch', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Bicycle Crunch', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Reverse Crunch', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
-  { name: 'Sit Up', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Hanging Leg Raise', muscle: 'Core', equipment: 'Bodyweight', difficulty: 'Intermediate' },
-  { name: 'Hanging Knee Raise', muscle: 'Core', equipment: 'Bodyweight', difficulty: 'Beginner' },
   { name: 'Cable Crunch', muscle: 'Core', equipment: 'Cable', difficulty: 'Beginner' },
   { name: 'Russian Twist', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'V-Up', muscle: 'Core', equipment: 'None', difficulty: 'Intermediate' },
   { name: 'Dragon Flag', muscle: 'Core', equipment: 'Bodyweight', difficulty: 'Advanced' },
   { name: 'Ab Wheel Rollout', muscle: 'Core', equipment: 'Ab Wheel', difficulty: 'Advanced' },
-  { name: 'Toe Touches', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Flutter Kicks', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Mountain Climbers', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
-  // Core - Isometric
   { name: 'Plank', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Side Plank', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Hollow Body Hold', muscle: 'Core', equipment: 'None', difficulty: 'Intermediate' },
   { name: 'L-Sit Hold', muscle: 'Core', equipment: 'Bodyweight', difficulty: 'Advanced' },
-  { name: 'Ab Wheel Rollout Hold', muscle: 'Core', equipment: 'Ab Wheel', difficulty: 'Advanced' },
   { name: 'Dead Bug Hold', muscle: 'Core', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Copenhagen Plank', muscle: 'Core', equipment: 'None', difficulty: 'Advanced' },
   { name: 'Pallof Press Hold', muscle: 'Core', equipment: 'Cable', difficulty: 'Beginner' },
-  { name: 'Ring Support Hold', muscle: 'Core', equipment: 'Rings', difficulty: 'Advanced' },
-  // Plyometrics
   { name: 'Box Jump', muscle: 'Plyometrics', equipment: 'Box', difficulty: 'Intermediate' },
   { name: 'Broad Jump', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
   { name: 'Burpee', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
@@ -125,132 +110,141 @@ const exercises = [
   { name: 'Lateral Bound', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
   { name: 'Clap Push Up', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Advanced' },
   { name: 'Medicine Ball Slam', muscle: 'Plyometrics', equipment: 'Medicine Ball', difficulty: 'Beginner' },
-  { name: 'Hurdle Jump', muscle: 'Plyometrics', equipment: 'Hurdle', difficulty: 'Intermediate' },
   { name: 'One Legged Jumping Split Squat', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Advanced' },
-  { name: 'Scissor Jump', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
-  { name: 'Reactive Step Up Jump', muscle: 'Plyometrics', equipment: 'Box', difficulty: 'Intermediate' },
-  { name: 'Plyo Push Up', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
-  { name: 'Single Leg Box Jump', muscle: 'Plyometrics', equipment: 'Box', difficulty: 'Advanced' },
   { name: 'Skater Jump', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Intermediate' },
   { name: 'Vertical Jump', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Beginner' },
   { name: 'Power Skip', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Beginner' },
-  { name: 'Triple Broad Jump', muscle: 'Plyometrics', equipment: 'None', difficulty: 'Advanced' },
 ]
 
-const muscleGroups = ['All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core', 'Plyometrics']
+const muscleGroups = ['ALL', 'CHEST', 'BACK', 'LEGS', 'SHOULDERS', 'ARMS', 'CORE', 'PLYOMETRICS']
 
 const difficultyColor = {
-  Beginner: 'bg-green-100 text-green-700',
-  Intermediate: 'bg-yellow-100 text-yellow-700',
-  Advanced: 'bg-red-100 text-red-700',
+  Beginner: '#2D6A4F',
+  Intermediate: '#B7791F',
+  Advanced: '#9B2335',
 }
 
-const muscleColor = {
-  Chest: 'bg-red-50 text-red-500',
-  Back: 'bg-blue-50 text-blue-500',
-  Legs: 'bg-purple-50 text-purple-500',
-  Shoulders: 'bg-orange-50 text-orange-500',
-  Arms: 'bg-pink-50 text-pink-500',
-  Core: 'bg-yellow-50 text-yellow-600',
-  Plyometrics: 'bg-green-50 text-green-600',
-}
+const BASE = '#EDE8DC'
+const DARK = '#3B2507'
+const MID = '#A0845C'
+const BORDER = '#C4A97D'
+const FONT = 'Arial Black, Arial, sans-serif'
 
 function tutorialUrl(name) {
-  return `https://www.youtube.com/results?search_query=how+to+${encodeURIComponent(name)}+exercise+tutorial`
+  return 'https://www.youtube.com/results?search_query=how+to+' + encodeURIComponent(name) + '+exercise+tutorial'
 }
 
 export default function Exercises() {
-  const [selected, setSelected] = useState('All')
+  const [selected, setSelected] = useState('ALL')
   const [search, setSearch] = useState('')
   const [expanded, setExpanded] = useState(null)
 
   const filtered = exercises.filter(e => {
-    const matchesMuscle = selected === 'All' || e.muscle === selected
+    const matchesMuscle = selected === 'ALL' || e.muscle.toUpperCase() === selected
     const matchesSearch = e.name.toLowerCase().includes(search.toLowerCase())
     return matchesMuscle && matchesSearch
   })
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-1">Exercise Library</h1>
-      <p className="text-gray-400 text-sm mb-4">{filtered.length} of {exercises.length} exercises</p>
+    <div style={{ minHeight: '100vh', backgroundColor: BASE, fontFamily: FONT }}>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search exercises..."
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-4 outline-none focus:border-blue-400"
-      />
+      {/* Header */}
+      <div style={{ padding: '48px 24px 20px', borderBottom: '2px solid ' + BORDER }}>
+        <p style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', color: MID, margin: '0 0 6px 0' }}>
+          BROWSE
+        </p>
+        <h1 style={{ fontSize: '36px', fontWeight: '900', textTransform: 'uppercase', color: DARK, margin: '0 0 16px 0', letterSpacing: '0.04em' }}>
+          EXERCISE LIBRARY
+        </h1>
+        <input
+          type="text"
+          placeholder="SEARCH EXERCISES..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{
+            width: '100%', border: '2px solid ' + BORDER, borderRadius: '4px',
+            padding: '10px 14px', fontSize: '11px', fontWeight: '900',
+            textTransform: 'uppercase', letterSpacing: '0.1em',
+            backgroundColor: BASE, color: DARK, fontFamily: FONT,
+            boxSizing: 'border-box', outline: 'none',
+          }}
+        />
+      </div>
 
       {/* Muscle group filters */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4">
-        {muscleGroups.map(group => (
+      <div style={{ display: 'flex', overflowX: 'auto', borderBottom: '2px solid ' + BORDER, backgroundColor: BASE }}>
+        {muscleGroups.map((group, i) => (
           <button
             key={group}
             onClick={() => setSelected(group)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
-              selected === group
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white text-gray-600 border-gray-200'
-            }`}
+            style={{
+              flexShrink: 0, padding: '12px 14px',
+              fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em',
+              color: selected === group ? DARK : MID,
+              background: 'none', border: 'none',
+              borderRight: '2px solid ' + BORDER,
+              borderBottom: selected === group ? '3px solid ' + DARK : '3px solid transparent',
+              cursor: 'pointer', fontFamily: FONT,
+            }}
           >
             {group}
           </button>
         ))}
       </div>
 
-      {/* Exercise cards */}
-      <div className="flex flex-col gap-3">
-        {filtered.map(exercise => (
-          <div
-            key={exercise.name}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-          >
-            {/* Card header — tap to expand */}
-            <button
-              onClick={() => setExpanded(expanded === exercise.name ? null : exercise.name)}
-              className="w-full p-4 text-left"
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="font-semibold text-gray-800">{exercise.name}</span>
-                <span className="text-gray-300 text-xs">{expanded === exercise.name ? '▲' : '▼'}</span>
-              </div>
-              <div className="flex gap-2">
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${muscleColor[exercise.muscle]}`}>
-                  {exercise.muscle}
-                </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${difficultyColor[exercise.difficulty]}`}>
-                  {exercise.difficulty}
-                </span>
-                <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
-                  {exercise.equipment}
-                </span>
-              </div>
-            </button>
-
-            {/* Expanded detail */}
-            {expanded === exercise.name && (
-              <div className="px-4 pb-4 border-t border-gray-50 pt-3">
-                <a
-                  href={tutorialUrl(exercise.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-lg"
-                >
-                  Watch tutorial on YouTube
-                </a>
-              </div>
-            )}
-          </div>
-        ))}
+      {/* Count */}
+      <div style={{ padding: '10px 24px', borderBottom: '2px solid ' + BORDER, fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.15em', color: MID }}>
+        {filtered.length} EXERCISES
       </div>
 
+      {/* Exercise rows */}
+      {filtered.map(exercise => (
+        <div key={exercise.name} style={{ borderBottom: '2px solid ' + BORDER, backgroundColor: BASE }}>
+          <button
+            onClick={() => setExpanded(expanded === exercise.name ? null : exercise.name)}
+            style={{ width: '100%', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div>
+              <div style={{ fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: DARK, fontFamily: FONT }}>
+                {exercise.name}
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: MID }}>{exercise.muscle}</span>
+                <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: difficultyColor[exercise.difficulty] }}>{exercise.difficulty}</span>
+                <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: MID }}>{exercise.equipment}</span>
+              </div>
+            </div>
+            <span style={{ fontSize: '10px', color: BORDER, fontWeight: '900' }}>
+              {expanded === exercise.name ? '▲' : '▼'}
+            </span>
+          </button>
+
+          {expanded === exercise.name && (
+            <div style={{ padding: '0 24px 16px' }}>
+              
+                href={tutorialUrl(exercise.name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block', fontSize: '10px', fontWeight: '900',
+                  textTransform: 'uppercase', letterSpacing: '0.12em',
+                  color: BASE, backgroundColor: DARK,
+                  padding: '8px 16px', borderRadius: '4px', textDecoration: 'none',
+                  fontFamily: FONT,
+                }}
+              >
+                WATCH TUTORIAL
+              </a>
+            </div>
+          )}
+        </div>
+      ))}
+
       {filtered.length === 0 && (
-        <div className="text-center text-gray-400 mt-12">
-          <div className="text-4xl mb-2">🔍</div>
-          <div>No exercises found</div>
+        <div style={{ textAlign: 'center', padding: '60px 24px' }}>
+          <div style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.15em', color: MID }}>
+            NO EXERCISES FOUND
+          </div>
         </div>
       )}
     </div>

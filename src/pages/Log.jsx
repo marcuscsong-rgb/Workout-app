@@ -7,9 +7,7 @@ export default function Log({ user }) {
   const [building, setBuilding] = useState(false)
   const [expanded, setExpanded] = useState(null)
 
-  useEffect(() => {
-    loadWorkouts()
-  }, [])
+  useEffect(() => { loadWorkouts() }, [])
 
   async function loadWorkouts() {
     const { data } = await supabase
@@ -21,79 +19,90 @@ export default function Log({ user }) {
   }
 
   if (building) {
-    return (
-      <WorkoutBuilder
-        user={user}
-        onSave={() => { loadWorkouts() }}
-        onClose={() => setBuilding(false)}
-      />
-    )
+    return <WorkoutBuilder user={user} onSave={() => loadWorkouts()} onClose={() => setBuilding(false)} />
   }
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Workout Log</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#EDE8DC', fontFamily: 'Arial Black, Arial, sans-serif' }}>
+
+      {/* Header */}
+      <div style={{ padding: '48px 24px 20px', borderBottom: '2px solid #C4A97D', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+        <div>
+          <p style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#A0845C', margin: '0 0 6px 0' }}>TRACK</p>
+          <h1 style={{ fontSize: '36px', fontWeight: '900', textTransform: 'uppercase', color: '#3B2507', margin: 0, letterSpacing: '0.04em' }}>WORKOUT LOG</h1>
+        </div>
         <button
           onClick={() => setBuilding(true)}
-          className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-xl"
+          style={{
+            fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em',
+            color: '#EDE8DC', backgroundColor: '#3B2507', border: 'none',
+            padding: '10px 16px', borderRadius: '4px', cursor: 'pointer',
+            fontFamily: 'Arial Black, Arial, sans-serif',
+          }}
         >
-          + New Workout
+          + NEW
         </button>
       </div>
 
+      {/* Workout list */}
       {workouts.length === 0 ? (
-        <div className="text-center text-gray-400 mt-16">
-          <div className="text-4xl mb-3">📋</div>
-          <div className="font-medium text-gray-500 mb-1">No workouts logged yet</div>
-          <div className="text-sm">Tap + New Workout to get started</div>
+        <div style={{ textAlign: 'center', padding: '60px 24px', color: '#A0845C' }}>
+          <div style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '8px' }}>NO WORKOUTS YET</div>
+          <div style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C4A97D' }}>TAP + NEW TO GET STARTED</div>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div>
           {workouts.map(workout => (
-            <div key={workout.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div key={workout.id} style={{ borderBottom: '2px solid #C4A97D', backgroundColor: '#EDE8DC' }}>
               <button
                 onClick={() => setExpanded(expanded === workout.id ? null : workout.id)}
-                className="w-full p-4 text-left"
+                style={{ width: '100%', padding: '18px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-gray-800">{workout.name}</span>
-                  <span className="text-gray-300 text-xs">{expanded === workout.id ? '▲' : '▼'}</span>
+                <div>
+                  <div style={{ fontSize: '16px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', fontFamily: 'Arial Black, Arial, sans-serif' }}>
+                    {workout.name}
+                  </div>
+                  <div style={{ display: 'flex', gap: '16px', marginTop: '4px' }}>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>
+                      {new Date(workout.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                    </span>
+                    <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>
+                      {workout.exercises.length} EXERCISES
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between mt-1">
-  <div className="text-xs text-gray-400">
-    {new Date(workout.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · {workout.exercises.length} exercises
-  </div>
-  <button
-    onClick={async (e) => {
-      e.stopPropagation()
-     if (confirm('Delete this workout?')) {
-  const { error } = await supabase.from('workouts').delete().eq('id', workout.id)
-  if (error) {
-    alert('Failed to delete: ' + error.message)
-  } else {
-    loadWorkouts()
-  }
-}
-    }}
-    className="text-xs text-red-400 font-medium"
-  >
-    Delete
-  </button>
-</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      if (confirm('Delete this workout?')) {
+                        const { error } = await supabase.from('workouts').delete().eq('id', workout.id)
+                        if (error) alert('Failed to delete: ' + error.message)
+                        else loadWorkouts()
+                      }
+                    }}
+                    style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9B2335', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+                  >
+                    DELETE
+                  </button>
+                  <span style={{ fontSize: '10px', color: '#C4A97D', fontWeight: '900' }}>{expanded === workout.id ? '▲' : '▼'}</span>
+                </div>
               </button>
+
               {expanded === workout.id && (
-                <div className="px-4 pb-4 border-t border-gray-50 pt-3">
+                <div style={{ padding: '0 24px 20px' }}>
                   {workout.exercises.map(ex => (
-                    <div key={ex.name} className="mb-3">
-                      <div className="font-medium text-sm text-gray-800 mb-1">{ex.name}</div>
-                      <div className="flex gap-3 text-xs text-gray-500">
-                        {ex.sets && <span>{ex.sets} sets</span>}
-                        {ex.reps && <span>{ex.reps} reps</span>}
-                        {ex.weight && <span>{ex.weight}</span>}
-                        {ex.duration && <span>{ex.duration}</span>}
+                    <div key={ex.name} style={{ marginBottom: '12px', paddingBottom: '12px', borderBottom: '1px solid #C4A97D' }}>
+                      <div style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#3B2507', marginBottom: '4px', fontFamily: 'Arial Black, Arial, sans-serif' }}>
+                        {ex.name}
                       </div>
-                      {ex.notes && <div className="text-xs text-gray-400 mt-0.5 italic">{ex.notes}</div>}
+                      <div style={{ display: 'flex', gap: '16px' }}>
+                        {ex.sets && <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>{ex.sets} SETS</span>}
+                        {ex.reps && <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>{ex.reps} REPS</span>}
+                        {ex.weight && <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>{ex.weight}</span>}
+                        {ex.duration && <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C' }}>{ex.duration}</span>}
+                      </div>
+                      {ex.notes && <div style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#C4A97D', marginTop: '3px' }}>{ex.notes}</div>}
                     </div>
                   ))}
                 </div>
