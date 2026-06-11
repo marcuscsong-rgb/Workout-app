@@ -1,20 +1,41 @@
 export default function BottomNav({ page, setPage }) {
   const tabs = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'exercises', label: 'Exercises', icon: '🏋️' },
-    { id: 'log', label: 'Log', icon: '✅' },
-    { id: 'food', label: 'Food', icon: '🥗' },
-    { id: 'hub', label: 'Hub', icon: '💬' },
+    { id: 'home', label: 'HOME' },
+    { id: 'exercises', label: 'EXERCISES' },
+    { id: 'log', label: 'LOG' },
+    { id: 'food', label: 'FOOD' },
+    { id: 'hub', label: 'HUB' },
   ]
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex">
-      {tabs.map(tab => (
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#D4C5A9',
+      borderTop: '2px solid #C4A97D',
+      display: 'flex',
+      fontFamily: 'Arial Black, Arial, sans-serif',
+    }}>
+      {tabs.map((tab, i) => (
         <button
           key={tab.id}
           onClick={() => setPage(tab.id)}
-          className={`flex-1 py-3 flex flex-col items-center text-xs gap-1 ${page === tab.id ? 'text-blue-600' : 'text-gray-400'}`}
+          style={{
+            flex: 1,
+            padding: '14px 0',
+            fontSize: '9px',
+            fontWeight: '900',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: page === tab.id ? '#3B2507' : '#A0845C',
+            background: 'none',
+            border: 'none',
+            borderRight: i < tabs.length - 1 ? '2px solid #C4A97D' : 'none',
+            cursor: 'pointer',
+            borderBottom: page === tab.id ? '3px solid #3B2507' : '3px solid transparent',
+          }}
         >
-          <span className="text-xl">{tab.icon}</span>
           {tab.label}
         </button>
       ))}

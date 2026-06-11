@@ -1,150 +1,153 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabase'
 
-export default function Home() {
+export default function Home({ user }) {
   const [status, setStatus] = useState('...')
+  const [username, setUsername] = useState('')
 
   useEffect(() => {
-    async function testConnection() {
+    async function load() {
       const { error } = await supabase.from('profiles').select('count')
       setStatus(error ? 'offline' : 'connected')
+      const { data } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single()
+      if (data) setUsername(data.username.toUpperCase())
     }
-    testConnection()
+    load()
   }, [])
 
   return (
-    <div className="min-h-screen relative p-6" style={{
-      backgroundColor: '#F5F0E8',
-      backgroundImage: `
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 39px,
-          #C4A882 39px,
-          #C4A882 40px
-        ),
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 39px,
-          #C4A882 39px,
-          #C4A882 40px
-        )
-      `,
-      fontFamily: 'Arial, sans-serif',
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#EDE8DC',
+      fontFamily: 'Arial Black, Arial, sans-serif',
+      padding: '0',
     }}>
-
-      {/* Main content */}
-      <div className="pt-8">
-        <div style={{ fontFamily: 'Arial, sans-serif' }}>
-
-          <p style={{
-            fontSize: '13px',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            letterSpacing: '0.15em',
-            color: '#8B6914',
-            marginBottom: '8px'
-          }}>
-            WELCOME BACK
-          </p>
-
-          <h1 style={{
-            fontSize: '42px',
-            fontWeight: '900',
-            textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            color: '#3B2507',
-            lineHeight: 1.1,
-            marginBottom: '32px'
-          }}>
-            LET'S GET<br />STRONG
-          </h1>
-
-          {/* Stats row */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
-            {[
-              { label: 'WORKOUTS', value: '—' },
-              { label: 'THIS WEEK', value: '—' },
-              { label: 'STREAK', value: '—' },
-            ].map(stat => (
-              <div key={stat.label} style={{
-                flex: 1,
-                background: 'rgba(255,255,255,0.6)',
-                border: '1.5px solid #C4A882',
-                borderRadius: '12px',
-                padding: '14px 10px',
-                textAlign: 'center',
-              }}>
-                <div style={{
-                  fontSize: '24px',
-                  fontWeight: '900',
-                  color: '#3B2507',
-                  fontFamily: 'Arial, sans-serif',
-                }}>{stat.value}</div>
-                <div style={{
-                  fontSize: '9px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  color: '#8B6914',
-                  marginTop: '4px',
-                  fontFamily: 'Arial, sans-serif',
-                }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Quick action cards */}
-          {[
-            { title: 'START A WORKOUT', sub: 'BUILD AND LOG YOUR SESSION', emoji: '🏋️' },
-            { title: 'EXERCISE LIBRARY', sub: 'BROWSE 100+ EXERCISES', emoji: '📚' },
-            { title: 'OPEN THE HUB', sub: 'SHARE WITH YOUR CREW', emoji: '💬' },
-          ].map(card => (
-            <div key={card.title} style={{
-              background: 'rgba(255,255,255,0.6)',
-              border: '1.5px solid #C4A882',
-              borderRadius: '14px',
-              padding: '18px 16px',
-              marginBottom: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '14px',
-            }}>
-              <span style={{ fontSize: '28px' }}>{card.emoji}</span>
-              <div>
-                <div style={{
-                  fontSize: '16px',
-                  fontWeight: '900',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  color: '#3B2507',
-                  fontFamily: 'Arial, sans-serif',
-                }}>{card.title}</div>
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: '#8B6914',
-                  marginTop: '2px',
-                  fontFamily: 'Arial, sans-serif',
-                }}>{card.sub}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Top bar */}
+      <div style={{
+        padding: '48px 24px 24px',
+        borderBottom: '2px solid #C4A97D',
+      }}>
+        <p style={{
+          fontSize: '11px',
+          fontWeight: '900',
+          textTransform: 'uppercase',
+          letterSpacing: '0.2em',
+          color: '#A0845C',
+          marginBottom: '6px',
+        }}>
+          WELCOME BACK
+        </p>
+        <h1 style={{
+          fontSize: '48px',
+          fontWeight: '900',
+          textTransform: 'uppercase',
+          letterSpacing: '0.04em',
+          color: '#3B2507',
+          lineHeight: 1,
+          margin: 0,
+        }}>
+          {username || "LET'S GET"}<br />
+          {username ? 'READY.' : 'STRONG.'}
+        </h1>
       </div>
 
-      {/* Supabase status — small, bottom left */}
+      {/* Stats section */}
+      <div style={{
+        padding: '24px',
+        borderBottom: '2px solid #C4A97D',
+        display: 'flex',
+        gap: '0',
+      }}>
+        {[
+          { label: 'WORKOUTS', value: '—' },
+          { label: 'THIS WEEK', value: '—' },
+          { label: 'STREAK', value: '—' },
+        ].map((stat, i) => (
+          <div key={stat.label} style={{
+            flex: 1,
+            textAlign: 'center',
+            borderRight: i < 2 ? '2px solid #C4A97D' : 'none',
+            padding: '8px 0',
+          }}>
+            <div style={{
+              fontSize: '32px',
+              fontWeight: '900',
+              color: '#3B2507',
+              fontFamily: 'Arial Black, Arial, sans-serif',
+              lineHeight: 1,
+            }}>{stat.value}</div>
+            <div style={{
+              fontSize: '9px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: '#A0845C',
+              marginTop: '4px',
+            }}>{stat.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Action items */}
+      <div style={{ padding: '0' }}>
+        {[
+          { title: 'START A WORKOUT', sub: 'BUILD AND LOG YOUR SESSION', tag: 'LOG' },
+          { title: 'EXERCISE LIBRARY', sub: 'BROWSE 100+ EXERCISES', tag: 'BROWSE' },
+          { title: 'THE HUB', sub: 'SHARE WITH YOUR CREW', tag: 'CHAT' },
+          { title: 'FOOD LOG', sub: 'TRACK YOUR NUTRITION', tag: 'TRACK' },
+        ].map((item, i) => (
+          <div key={item.title} style={{
+            padding: '20px 24px',
+            borderBottom: '2px solid #C4A97D',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <div>
+              <div style={{
+                fontSize: '18px',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                color: '#3B2507',
+                fontFamily: 'Arial Black, Arial, sans-serif',
+              }}>{item.title}</div>
+              <div style={{
+                fontSize: '10px',
+                fontWeight: '900',
+                textTransform: 'uppercase',
+                letterSpacing: '0.12em',
+                color: '#A0845C',
+                marginTop: '3px',
+              }}>{item.sub}</div>
+            </div>
+            <div style={{
+              fontSize: '10px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: '#A0845C',
+              border: '2px solid #C4A97D',
+              padding: '4px 10px',
+              borderRadius: '4px',
+            }}>{item.tag}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Status dot */}
       <div style={{
         position: 'fixed',
         bottom: '72px',
-        left: '12px',
-        fontSize: '9px',
-        fontWeight: 'bold',
+        left: '10px',
+        fontSize: '8px',
+        fontWeight: '900',
         textTransform: 'uppercase',
-        letterSpacing: '0.08em',
+        letterSpacing: '0.1em',
         color: status === 'connected' ? '#16a34a' : '#9ca3af',
         fontFamily: 'Arial, sans-serif',
       }}>
