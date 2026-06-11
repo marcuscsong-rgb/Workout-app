@@ -12,7 +12,10 @@ export default function Hub({ user }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showWorkoutPicker, setShowWorkoutPicker] = useState(false)
-  const [myWorkouts, setMyWorkouts] = useState([])
+ const [myWorkouts, setMyWorkouts] = useState([])
+const [showInvite, setShowInvite] = useState(false)
+const [inviteToHub, setInviteToHub] = useState('')
+const [inviteMsg, setInviteMsg] = useState(null)
   const bottomRef = useRef(null)
 
   useEffect(() => { loadHubs() }, [])
@@ -59,7 +62,28 @@ export default function Hub({ user }) {
     await supabase.from('messages').insert({ hub_id: activeHub.id, user_id: user.id, type: 'text', content: newMessage.trim() })
     setNewMessage('')
   }
-
+async function inviteMember() {
+  if (!inviteToHub.trim()) return
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('username', inviteToHub.trim())
+    .single()
+  if (!profile) {
+    setInviteMsg('User not found')
+    return
+  }
+  const { error } = await supabase
+    .from('hub_members')
+    .insert({ hub_id: activeHub.id, user_id: profile.id })
+  if (error) {
+    setInviteMsg('Could not add user')
+  } else {
+    setInviteMsg(inviteToHub + ' added!')
+    setInviteToHub('')
+    setTimeout(() => setInviteMsg(null), 3000)
+  }
+}
   async function sendWorkout(workout) {
     await supabase.from('messages').insert({ hub_id: activeHub.id, user_id: user.id, type: 'workout', content: workout.name, workout_id: workout.id })
     setShowWorkoutPicker(false)
@@ -164,11 +188,37 @@ export default function Hub({ user }) {
   const grouped = groupByDate(messages)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', paddingBottom: '64px', backgroundColor: '#EDE8DC', fontFamily: 'Arial Black, Arial, sans-serif' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '48px 24px 16px', borderBottom: '2px solid #C4A97D', backgroundColor: '#EDE8DC' }}>
-        <button onClick={() => setActiveHub(null)} style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}>← BACK</button>
-        <span style={{ fontSize: '18px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507' }}>{activeHub.name}</span>
-      </div>
-
+      <div style={{ borderBottom: '2px solid #C4A97D', backgroundColor: '#EDE8DC' }}>
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '48px 24px 16px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <button onClick={() => setActiveHub(null)} style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}>← BACK</button>
+      <span style={{ fontSize: '18px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507' }}>{activeHub.name}</span>
+    </div>
+    <button
+      onClick={() => setShowInvite(!showInvite)}
+      style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', border: '2px solid #C4A97D', background: 'none', padding: '6px 10px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+    >
+      + INVITE
+    </button>
+  </div>
+  {showInvite && (
+    <div style={{ padding: '0 24px 16px', display: 'flex', gap: '8px' }}>
+      <input
+        type="text"
+        placeholder="USERNAME..."
+        value={inviteToHub}
+        onChange={e => setInviteToHub(e.target.value)}
+        style={{ flex: 1, border: '2px solid #C4A97D', borderRadius: '4px', padding: '8px 12px', fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', backgroundColor: '#EDE8DC', color: '#3B2507', fontFamily: 'Arial Black, Arial, sans-serif', outline: 'none' }}
+      />
+      <button
+        onClick={inviteMember}
+        style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#EDE8DC', backgroundColor: '#3B2507', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+      >
+        ADD
+      </button>
+    </div>
+  )}
+</div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 24px' }}>
         {Object.entries(grouped).map(([date, msgs]) => (
           <div key={date}>
