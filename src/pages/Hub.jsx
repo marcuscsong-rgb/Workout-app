@@ -12,6 +12,7 @@ export default function Hub({ user }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showWorkoutPicker, setShowWorkoutPicker] = useState(false)
+  const [myUsername, setMyUsername] = useState('')
 const [myWorkouts, setMyWorkouts] = useState([])
 const [expandedMsg, setExpandedMsg] = useState(null)
   const [editingHub, setEditingHub] = useState(null)
@@ -22,7 +23,12 @@ const [inviteToHub, setInviteToHub] = useState('')
 const [inviteMsg, setInviteMsg] = useState(null)
   const bottomRef = useRef(null)
 
-  useEffect(() => { loadHubs() }, [])
+ useEffect(() => {
+    loadHubs()
+    supabase.from('profiles').select('username').eq('id', user.id).single().then(({ data }) => {
+      if (data) setMyUsername(data.username.toUpperCase())
+    })
+  }, [])
   useEffect(() => {
     if (!activeHub) return
     loadMessages(activeHub.id)
@@ -69,8 +75,14 @@ const [inviteMsg, setInviteMsg] = useState(null)
 
   async function sendMessage() {
     if (!newMessage.trim()) return
-    await supabase.from('messages').insert({ hub_id: activeHub.id, user_id: user.id, type: 'text', content: newMessage.trim() })
+    const text = newMessage.trim()
     setNewMessage('')
+    const { data } = await supabase
+      .from('messages')
+      .insert({ hub_id: activeHub.id, user_id: user.id, type: 'text', content: text })
+      .select('*, profiles(username), workouts(name, exercises)')
+      .single()
+    if (data) setMessages(prev => prev.some(m => m.id === data.id) ? prev : [...prev, data])
   }
   async function deleteHub(hubId) {
     if (!confirm('Delete this hub and all its messages?')) return
@@ -110,8 +122,13 @@ async function inviteMember() {
   }
 }
   async function sendWorkout(workout) {
-    await supabase.from('messages').insert({ hub_id: activeHub.id, user_id: user.id, type: 'workout', content: workout.name, workout_id: workout.id })
     setShowWorkoutPicker(false)
+    const { data } = await supabase
+      .from('messages')
+      .insert({ hub_id: activeHub.id, user_id: user.id, type: 'workout', content: workout.name, workout_id: workout.id })
+      .select('*, profiles(username), workouts(name, exercises)')
+      .single()
+    if (data) setMessages(prev => prev.some(m => m.id === data.id) ? prev : [...prev, data])
   }
 
   function groupByDate(messages) {
@@ -146,6 +163,7 @@ async function inviteMember() {
         <div>
           <p style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em', color: '#A0845C', margin: '0 0 6px 0' }}>SHARE</p>
           <h1 style={{ fontSize: '36px', fontWeight: '900', textTransform: 'uppercase', color: '#3B2507', margin: 0, letterSpacing: '0.04em' }}>MY HUBS</h1>
+          <div style={{ position: 'fixed', top: '12px', right: '12px', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A0845C', zIndex: 10 }}>@{myUsername}</div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
@@ -156,7 +174,9 @@ async function inviteMember() {
           </button>
           <button onClick={() => setShowNewHub(true)} style={btnPrimary}>+ NEW</button>
         </div>
+        <div style={{ position: 'fixed', top: '12px', right: '12px', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A0845C', zIndex: 10 }}>@{myUsername}</div>
       </div>
+      
 
       {showNewHub && (
         <div style={{ padding: '20px 24px', borderBottom: '2px solid #C4A97D', backgroundColor: '#EDE8DC' }}>
@@ -254,6 +274,20 @@ async function inviteMember() {
     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
       <button onClick={() => setActiveHub(null)} style={{ fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}>← BACK</button>
       <span style={{ fontSize: '18px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507' }}>{activeHub.name}</span>
+      <button
+        onClick={() => {
+          const newName = prompt('Rename this hub:', activeHub.name)
+          if (newName && newName.trim()) {
+            supabase.from('hubs').update({ name: newName.trim() }).eq('id', activeHub.id).then(({ error }) => {
+              if (error) alert('Failed to rename: ' + error.message)
+              else { setActiveHub({ ...activeHub, name: newName.trim() }); loadHubs() }
+            })
+          }
+        }}
+        style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', background: 'none', border: '2px solid #C4A97D', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontFamily: 'Arial Black, Arial, sans-serif' }}
+      >
+        RENAME
+      </button>
     </div>
     <button
       onClick={() => setShowInvite(!showInvite)}

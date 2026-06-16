@@ -110,6 +110,7 @@ export default function WorkoutBuilder({ user, onSave, onClose }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [view, setView] = useState('build') // 'build' or 'review'
+  const [customName, setCustomName] = useState('')
 
   const filtered = exercises.filter(e => {
     const matchesMuscle = selected === 'All' || e.muscle === selected
@@ -209,6 +210,27 @@ export default function WorkoutBuilder({ user, onSave, onClose }) {
             ))}
           </div>
           <div className="flex flex-col gap-2">
+            <div style={{ marginBottom: '12px', display: 'flex', gap: '8px' }}>
+            <input
+              type="text"
+              placeholder="Add custom exercise..."
+              value={customName}
+              onChange={e => setCustomName(e.target.value)}
+              style={{ flex: 1, border: '1.5px solid #C4A97D', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', outline: 'none' }}
+            />
+            <button
+              onClick={() => {
+                if (!customName.trim()) return
+                if (workout.find(w => w.name === customName.trim())) { setCustomName(''); return }
+                setWorkout([...workout, { name: customName.trim(), muscle: 'Custom', sets: '', reps: '', weight: '', duration: '', notes: '' }])
+                setCustomName('')
+                setView('review')
+              }}
+              style={{ background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Add
+            </button>
+          </div>
             {filtered.map(exercise => {
               const added = workout.find(w => w.name === exercise.name)
               return (
