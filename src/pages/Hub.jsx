@@ -13,6 +13,7 @@ export default function Hub({ user }) {
   const [error, setError] = useState(null)
   const [showWorkoutPicker, setShowWorkoutPicker] = useState(false)
 const [myWorkouts, setMyWorkouts] = useState([])
+const [expandedMsg, setExpandedMsg] = useState(null)
   const [editingHub, setEditingHub] = useState(null)
   const [editName, setEditName] = useState('')
   const [sort, setSort] = useState('az')
@@ -23,7 +24,13 @@ const [inviteMsg, setInviteMsg] = useState(null)
 
   useEffect(() => { loadHubs() }, [])
   useEffect(() => {
-    if (activeHub) { loadMessages(activeHub.id); subscribeToMessages(activeHub.id) }
+    if (!activeHub) return
+    loadMessages(activeHub.id)
+    const channel = supabase
+      .channel('hub-' + activeHub.id)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'hub_id=eq.' + activeHub.id }, () => loadMessages(activeHub.id))
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [activeHub])
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -288,17 +295,34 @@ async function inviteMember() {
                   <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', alignItems: isMe ? 'flex-end' : 'flex-start' }}>
                     {!isMe && <span style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#A0845C', marginBottom: '3px' }}>{msg.profiles?.username}</span>}
                     {msg.type === 'workout' ? (
-                      <div style={{ border: '2px solid #C4A97D', borderRadius: '6px', overflow: 'hidden', minWidth: '180px' }}>
-                        <div style={{ padding: '6px 12px', backgroundColor: isMe ? '#3B2507' : '#C4A97D', fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#EDE8DC' }}>WORKOUT SHARED</div>
+                      <div
+                        onClick={() => setExpandedMsg(expandedMsg === msg.id ? null : msg.id)}
+                        style={{ border: '2px solid #C4A97D', borderRadius: '6px', overflow: 'hidden', minWidth: '200px', cursor: 'pointer' }}
+                      >
+                        <div style={{ padding: '6px 12px', backgroundColor: isMe ? '#3B2507' : '#C4A97D', fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.12em', color: '#EDE8DC', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+                          <span>WORKOUT SHARED</span>
+                          <span>{expandedMsg === msg.id ? 'HIDE' : 'TAP TO VIEW'}</span>
+                        </div>
                         <div style={{ padding: '10px 12px', backgroundColor: '#EDE8DC' }}>
-                          <div style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', marginBottom: '6px' }}>{msg.content}</div>
-                          {msg.workouts?.exercises?.slice(0, 4).map(ex => (
-                            <div key={ex.name} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C', marginBottom: '3px' }}>
-                              <span>{ex.name}</span>
-                              {ex.sets && ex.reps && <span>{ex.sets}x{ex.reps}</span>}
+                          <div style={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', marginBottom: '8px' }}>{msg.content}</div>
+                          {expandedMsg === msg.id ? (
+                            (msg.workouts?.exercises || []).map(ex => (
+                              <div key={ex.name} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #C4A97D' }}>
+                                <div style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.04em', color: '#3B2507', marginBottom: '3px' }}>{ex.name}</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                  {ex.sets ? <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C' }}>{ex.sets} SETS</span> : null}
+                                  {ex.reps ? <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C' }}>{ex.reps} REPS</span> : null}
+                                  {ex.weight ? <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C' }}>{ex.weight}</span> : null}
+                                  {ex.duration ? <span style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C' }}>{ex.duration}</span> : null}
+                                </div>
+                                {ex.notes ? <div style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#C4A97D', marginTop: '3px' }}>{ex.notes}</div> : null}
+                              </div>
+                            ))
+                          ) : (
+                            <div style={{ fontSize: '9px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#A0845C' }}>
+                              {(msg.workouts?.exercises?.length || 0)} EXERCISES
                             </div>
-                          ))}
-                          {msg.workouts?.exercises?.length > 4 && <div style={{ fontSize: '8px', fontWeight: '900', textTransform: 'uppercase', color: '#C4A97D', marginTop: '4px' }}>+{msg.workouts.exercises.length - 4} MORE</div>}
+                          )}
                         </div>
                       </div>
                     ) : (
@@ -344,3 +368,4 @@ async function inviteMember() {
     </div>
   )
 }
+

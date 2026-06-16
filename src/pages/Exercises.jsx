@@ -221,7 +221,7 @@ export default function Exercises() {
 
           {expanded === exercise.name && (
             <div style={{ padding: '0 24px 16px' }}>
-              
+              <a
                 href={tutorialUrl(exercise.name)}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -231,8 +231,7 @@ export default function Exercises() {
                   color: BASE, backgroundColor: DARK,
                   padding: '8px 16px', borderRadius: '4px', textDecoration: 'none',
                   fontFamily: FONT,
-                }}
-              >
+                }}>
                 WATCH TUTORIAL
               </a>
             </div>
