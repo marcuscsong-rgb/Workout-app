@@ -5,6 +5,7 @@ export default function BottomNav({ page, setPage }) {
     { id: 'log', label: 'LOG' },
     { id: 'food', label: 'FOOD' },
     { id: 'hub', label: 'HUB' },
+    { id: 'profile', label: 'PROFILE' },
   ]
   return (
     <div style={{

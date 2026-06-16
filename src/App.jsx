@@ -7,6 +7,7 @@ import Log from './pages/Log'
 import Food from './pages/Food'
 import Hub from './pages/Hub'
 import BottomNav from './components/BottomNav'
+import Profile from './pages/Profile'
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -34,7 +35,7 @@ export default function App() {
 
   if (!user) return <Auth onLogin={setUser} />
 
-  const pages = { home: Home, exercises: Exercises, log: Log, food: Food, hub: Hub }
+  const pages = { home: Home, exercises: Exercises, log: Log, food: Food, hub: Hub, profile: Profile }
   const CurrentPage = pages[page]
 
   return (
